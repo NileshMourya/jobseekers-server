@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
 import { jobs } from "../model/jobs.js";
+
 export const createJobs = async (req, res) => {
   try {
     const {

@@ -4,7 +4,7 @@ const jobSchema = mongoose.Schema({
   title: String,
   companyName: String,
   location: String,
-  skills: String,
+  skills: { type: [String], default: [] },
   decription: String,
   roleResponsibility: String,
   postedBy: {

@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
   },
 
   isInvited: { type: Boolean, default: false },
+  profileId: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
 });
 
 export const users = mongoose.model("users", userSchema);

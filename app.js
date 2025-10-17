@@ -2,6 +2,7 @@ import express from "express";
 import userRoute from "./routes/userRoute.js";
 import jobRoute from "./routes/jobsRoute.js";
 import referralRoute from "./routes/referralRoute.js";
+import resumeUpload from "./routes/fileUpload.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 const app = express();
@@ -21,5 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", userRoute);
 app.use("/api", jobRoute);
 app.use("/api", referralRoute);
+app.use("/api", resumeUpload);
 
 export default app;
