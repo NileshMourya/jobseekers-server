@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
 import { jobs } from "../model/jobs.js";
+import { Profile } from "../model/profile.js";
 
 export const createJobs = async (req, res) => {
   try {
@@ -54,5 +55,56 @@ export const getAllJobs = async (req, res) => {
     return res.status(200).json(jobData);
   } catch (error) {
     return res.json({ status: 404, message: error });
+  }
+};
+
+// JOB RECOMMENDATION BASED ON SKILLS
+export const getRecommendation = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // GET PROFILE FROM BY USING USERID
+    const profile = await Profile.findOne({ userId: userId });
+
+    if (!profile) {
+      return res.status(404).json({ message: "User profile not found" });
+    }
+
+    const userSkills = profile.skills || [];
+
+    // USER REGX FOR INCASESENSITVE
+
+    const skillRegexArray = userSkills.map(
+      (skill) => new RegExp(skill.replace(/\s+/g, "-"), "i")
+    );
+
+    if (!userSkills.length) {
+      return res
+        .status(200)
+        .json({ message: "No skills found in profile", jobs: [] });
+    }
+
+    if (!matchedJobs.length) {
+      return res.status(200).json({
+        message: "No matching jobs found for your skills",
+        jobs: [],
+      });
+    }
+
+    // FIND SKILLS FOR MATCHING SKILLS
+    const matchedJobs = await jobs.find({
+      skills: { $in: skillRegexArray },
+    });
+
+    // RETURN MATCHING SKILLS
+
+    return res.status(200).json({
+      message: "Jobs found",
+      count: matchedJobs.length,
+      jobs: matchedJobs,
+    });
+  } catch (error) {
+    console.error("Recommendation Error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

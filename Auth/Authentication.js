@@ -98,6 +98,21 @@ export const login = async (req, res) => {
   }
 };
 
+export const handleLogout = async (req, res) => {
+  try {
+    res.setHeader("Set-Cookie", [
+      `accessToken=; HttpOnly; Path=/; SameSite=Strict; Secure`,
+      `refreshToken=; HttpOnly; Path=/; SameSite=Strict; Secure`,
+    ]);
+
+    return res.status(200).json({ message: "Logout Successfull" });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const refreshToken = async (req, res) => {
   try {
     let refreshToken;
@@ -165,20 +180,20 @@ export const handleProfile = async (req, res) => {
     const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
     const userId = decode.id;
 
+    const updatedFields = {
+      role,
+      username,
+      bio,
+      location,
+      skills,
+    };
+
+    if (github) updatedFields["socialLinks.github"] = github;
+    if (linkedin) updatedFields["socialLinks.linkedin"] = linkedin;
     const updateProfile = await Profile.findOneAndUpdate(
       { userId },
       {
-        $set: {
-          role,
-          username,
-          bio,
-          location,
-          skills,
-          socialLinks: {
-            github,
-            linkedin,
-          },
-        },
+        $set: updatedFields,
       },
       { new: true, upsert: false }
     );

@@ -17,7 +17,13 @@ cloudinary.v2.config({
 const streamUpload = (fileBuffer) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.v2.uploader.upload_stream(
-      { resource_type: "raw", folder: "resumes" },
+      {
+        resource_type: "raw",
+        folder: "resumes",
+        format: "pdf",
+        public_id: "jobseekers",
+        access_mode: "public",
+      },
       (error, result) => {
         if (result) resolve(result);
         else reject(error);
@@ -38,7 +44,6 @@ export const handlePdfUpload = async (req, res) => {
 
     const uploadResult = await streamUpload(req.file.buffer);
     const resumeUrl = await uploadResult.secure_url;
-    console.log(resumeUrl);
 
     const token = await fetchToken(req);
     const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
@@ -48,12 +53,10 @@ export const handlePdfUpload = async (req, res) => {
       { userId },
       {
         $set: {
-          socialLinks: {
-            resumeLink: resumeUrl,
-          },
+          "socialLinks.resumeLink": resumeUrl,
         },
       },
-      { new: true, upsert: false }
+      { new: true }
     );
 
     if (!updateProfile) {

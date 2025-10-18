@@ -3,6 +3,7 @@ import {
   createUsers,
   deleteUser,
   handleFetchProfile,
+  handleLogout,
   handleProfile,
   login,
   refreshToken,
@@ -16,4 +17,5 @@ route.post("/refresh-token", refreshToken);
 route.post("/removeUser", deleteUser);
 route.post("/profile-update", protect, handleProfile);
 route.get("/profile", protect, handleFetchProfile);
+route.get("/logout", handleLogout);
 export default route;
